@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Globals } from './globals';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ProjectFront';
+  title = Globals.APP_NAME;
 }
