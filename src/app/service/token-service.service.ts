@@ -20,7 +20,7 @@ export class TokenServiceService {
 
   getAuthorizationToken(): string {
     // Generate a new token with new nonce each time otherwise it's a replay attack
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('id-token');
     this.token = token;
     return this.token;
   }
@@ -28,12 +28,12 @@ export class TokenServiceService {
   setAuthorizationToken(token: string) {
     // Save static parts of the token
     this.token = token;
-    localStorage.setItem('access_token', this.token);
+    localStorage.setItem('id-token', this.token);
   }
 
   cleanAuthorizationToken() {
     // Clean token informations
     this.token = null;
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('id-token');
   }
 }

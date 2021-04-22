@@ -1,57 +1,56 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { LoginService } from '../../service/login.service';
 import { TokenServiceService } from '../../service/token-service.service';
 import { Observable } from 'rxjs';
+import { User } from '../../class/user';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  $login: Observable<{ token?: string }>;
+  public loginForm: FormGroup;
   token: string;
   error: string;
-
-  credentialsForm = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
+  isConnected: boolean;
 
   constructor(
     private apiService: LoginService,
     private tokenService: TokenServiceService,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder
   ) { }
 
   ngOnInit() {
-    this.token = this.tokenService.getAuthorizationToken();
+    this.loginForm = this.fb.group({
+      username : ['', Validators.required],
+      password : ['', Validators.required],
+    });
   }
 
-  onSubmit() {
-    const credentials: { username: string; password: string } = this
-      .credentialsForm.value;
-
-    // Login should return jwt token
-    this.$login = this.apiService.postCredentials(credentials);
-
-    this.$login.subscribe(
-      // Show generated token
-      ({ token }) => {
-        console.log('Received JWT token', token);
-        this.tokenService.setAuthorizationToken(token);
-        this.token = token;
-      },
-      // Show server error
-      (error: HttpErrorResponse) => {
-        console.error(error);
-        this.error = error.message;
-      }
-    );
+  login() {
+    const val = this.loginForm.value;
+    if (val.username && val.password) {
+      this.apiService.postCredentials(val.username, val.password)
+        .subscribe((data) => {
+          this.apiService.profile().subscribe(
+            (user) => {
+              console.log(user);
+              this.router.navigate(['/profile']);            
+             },
+            (err) => {
+              console.error(err);
+            });
+        },
+          (err) => {
+            console.error(err);
+          });
+    }
   }
 
   onLogout() {

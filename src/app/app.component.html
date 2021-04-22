@@ -329,7 +329,8 @@
 
 <div class="content" role="main">
 {{ title }}
-<a routerLink="/login">Login</a>
+<a *ngIf="!isConnected()" routerLink="/login">Login</a>
+<p *ngIf="isConnected()">{{ user.username }}</p>
   
 </div>
 

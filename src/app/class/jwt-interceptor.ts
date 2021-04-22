@@ -1,25 +1,24 @@
-import { TokenServiceService } from '../service/token-service.service';
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { LoginService } from '../service/login.service';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private tokenService: TokenServiceService) {}
+    constructor(private authService: LoginService) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const authToken = this.tokenService.getAuthorizationToken();
+    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        // add authorization header with jwt token if available
+        const tokenData = this.authService.tokenData;
+        if (tokenData && tokenData.token) {
+            request = request.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${tokenData.token}`
+                }
+            });
+        }
 
-    if (authToken) {
-      // Clone the request and replace the original headers with
-      // cloned headers, updated with the authorization.
-      const authReq = req.clone({
-        headers: req.headers.set('Authorization', `Bearer ${authToken}`)
-      });
-      // send cloned request with header to the next handler.
-      return next.handle(authReq);
-    } else {
-      // otherwise send request without token
-      return next.handle(req);
+        return next.handle(request);
     }
-  }
 }

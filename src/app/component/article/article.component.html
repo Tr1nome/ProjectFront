@@ -1,0 +1,16 @@
+<p>article works!</p>
+    <div *ngIf="articles?.length > 0">
+        <div *ngFor="let article of articles ">
+            <b>{{article.title}}</b>:
+            {{ article.content }}
+            <small>{{ article.user.username }}</small>
+        </div>
+    </div>
+
+    <div *ngIf="articles?.length == 0">
+        <div>
+            Aucun article pour le moment 
+        </div>
+    </div>
+
+
